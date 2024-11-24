@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bookmarkly - Your Favorite Bookmarks</title>
+
+    <!-- FavIcon -->
+    <link rel="icon" href="images/favicon.svg" type="image/svg+xml" />
+
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="css/all.min.css" />
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="css/bootstrap.min.css" />
+
+    <!-- Main CSS File -->
+    <link rel="stylesheet" href="css/main.css" />
+  </head>
+  <body class="d-flex flex-column min-vh-100">
+    <!-- Info Dialog for Empty Bookmark Fields -->
+    <div id="infoOverlay" class="info-overlay d-none"></div>
+    <div class="container">
+      <div class="row px-2">
+        <div
+          class="bookmark-info position-absolute top-50 start-50 translate-middle rounded-2 p-5 rounded-2 text-center d-none col-10 col-md-8 col-lg-6 col-xl-5"
+          id="infoDialog"
+        >
+          <h2 class="small-caps">
+            <i class="fa-regular fa-circle-question marked"></i> Oops...
+          </h2>
+          <p class="fs-6">
+            Please fill in all fields before adding a
+            <span class="fw-bold marked">bookmark.</span>
+          </p>
+          <button
+            id="closeInfo"
+            class="btn btn-add text-white"
+            onclick="closeInfo();"
+          >
+            Close
+          </button>
+        </div>
+        <div
+          class="duplication-info position-absolute top-50 start-50 translate-middle rounded-2 p-5 rounded-2 text-center d-none col-10 col-md-8 col-lg-6 col-xl-5"
+          id="duplicationDialog"
+        >
+          <h2 class="small-caps">
+            <i class="fa-regular fa-circle-question marked"></i> Oops...
+          </h2>
+          <p class="fs-6">
+            The <span class="fw-bold marked">bookmark</span> already exists.
+            Please enter a unique one.
+          </p>
+          <button
+            id="closeDuplicationDialog"
+            class="btn btn-add text-white"
+            onclick="closeDuplicationDialog();"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Header -->
+    <header class="py-3">
+      <div class="container-fluid px-2 px-md-4">
+        <div class="logo d-flex gap-1 align-items-center">
+          <svg
+            viewBox="0 0 24 24"
+            width="3.125rem"
+            height="auto"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M12.5 9.5a.5.5 0 0 0 .2.4l2 1.5a.5.5 0 0 0 .6 0l2-1.5a.5.5 0 0 0 .2-.4v-1a5.5 5.5 0 0 0-11 0v7a.5.5 0 0 1-1 0v-3A.5.5 0 0 0 5 12H1a.5.5 0 0 0-.5.5v3a5.5 5.5 0 0 0 11 0v-7a.5.5 0 0 1 1 0Z"
+              fill="var(--primary-color)"
+            ></path>
+            <path
+              d="M23 12h-4a.5.5 0 0 0-.5.5v3a.5.5 0 0 1-1 0v-3a.5.5 0 0 0-.8-.4L15 13.38l-1.7-1.28a.5.5 0 0 0-.8.4v3a5.5 5.5 0 0 0 11 0v-3a.5.5 0 0 0-.5-.5Z"
+              fill="var(--primary-color)"
+            ></path>
+          </svg>
+          <h1 class="m-0 small-caps fs-2 fs-sm-3 fs-md-1">Bookmarkly</h1>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content Section -->
+    <main class="container mt-4">
+      <div class="row px-2">
+        <!-- Dashboard -->
+        <div class="dashboard p-0">
+          <div
+            class="dashboard-header d-flex justify-content-between align-items-center py-3 mb-2 col-12"
+          >
+            <h2 class="small-caps m-0 fs-3 fs-sm-4 fs-md-2">Dashboard</h2>
+            <button
+              id="addBtn"
+              class="btn btn-primary btn-add d-flex align-items-center"
+              onclick="addBookmark();"
+            >
+              <i class="fas fa-plus"></i>
+              <span class="ms-2">Bookmark</span>
+            </button>
+          </div>
+
+          <!-- Inputs for Bookmarks -->
+          <div class="dashboard-input">
+            <div class="form-floating pb-3">
+              <input
+                type="text"
+                class="form-control rounded-2 ps-5"
+                id="siteName"
+                placeholder="Site Name"
+                autocomplete="off"
+                oninput="isValidInput(this);"
+              />
+              <label for="siteName" class="form-label">Site Name</label>
+              <i class="fa-solid fa-house site-icon"></i>
+            </div>
+            <div class="form-floating pb-3">
+              <input
+                type="URL"
+                class="form-control rounded-2 ps-5"
+                id="siteUrl"
+                placeholder="Site URL"
+                autocomplete="off"
+                oninput="isValidInput(this);"
+              />
+              <label for="siteURL" class="form-label">Site URL</label>
+              <i class="fa-solid fa-link site-icon"></i>
+            </div>
+          </div>
+
+          <!-- Input Validation Dialog -->
+          <div class="container">
+            <div class="row">
+              <div class="input-rules rounded-2 p-4 d-none" id="inputDialog">
+                <h2 class="small-caps">Input Rules</h2>
+                <ul class="list-unstyled">
+                  <!-- Site Name Rules -->
+                  <li>
+                    <span class="fw-bold marked">Site Name</span>
+                    <ul>
+                      <li>Must start with a capital letter.</li>
+                      <li>Can only contain letters, numbers, and spaces.</li>
+                      <li>
+                        You can use one or two words, separated by a space.
+                      </li>
+                      <li>Maximum length is 30 characters.</li>
+                    </ul>
+                  </li>
+                  <!-- Site URL Rules -->
+                  <li class="pt-2">
+                    <span class="fw-bold marked">Site URL</span>
+                    <ul>
+                      <li>
+                        Must start with
+                        <span class="fw-bold marked">http://</span> or
+                        <span class="fw-bold marked">https://</span>.
+                      </li>
+                      <li>
+                        Can optionally contain
+                        <span class="fw-bold marked">www.</span>.
+                      </li>
+                      <li>
+                        Ensure the domain is in the format:
+                        <span class="fw-bold marked">example.com</span>.
+                      </li>
+                    </ul>
+                  </li>
+                  <!-- General Field Requirements -->
+                  <li class="pt-2">
+                    <span class="fw-bold marked">All Fields</span>
+                    <ul>
+                      <li>All fields are required and cannot be left empty.</li>
+                    </ul>
+                  </li>
+                </ul>
+                <!-- Close button -->
+                <button
+                  id="closeDialogBtn"
+                  class="btn btn-add text-white"
+                  onclick="closeDialog();"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Empty Dashboard -->
+          <div
+            id="emptyDashboard"
+            class="dashboard-content d-flex justify-content-center align-items-center text-center shadow-sm rounded-2 p-4 mt-2 col-12"
+          >
+            <div
+              class="no-bookmark d-flex justify-content-center align-items-center"
+            >
+              <p class="m-0 fs-4 fs-sm-5 fs-md-3">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 32 32"
+                  width="6rem"
+                  height="auto"
+                  id="campfire"
+                >
+                  <path
+                    fill="var(--primary-color)"
+                    d="M5.2251 26.2705A.8186.8186 0 014.02 25.38a.8113.8113 0 01.3-.48l4.1167-2L7.563 21.1006l-4.1938 2.042A2.8228 2.8228 0 004.835 28.3838a2.6731 2.6731 0 001.334-.3506l6.2783-3.1387-.8945-1.7891zM29.9312 24.9414a2.8671 2.8671 0 00-1.3774-1.8408l-4.1167-2-.874 1.7988 4.04 1.958a.8187.8187 0 01.26 1.1563.8391.8391 0 01-1.1367.23l-6.2783-3.1387-.8945 1.7891 6.229 3.1123A2.8193 2.8193 0 0029.9312 24.9414z"
+                  ></path>
+                  <path
+                    fill="var(--primary-color)"
+                    d="M16.53,2.1523A0.9994,0.9994,0,0,0,15.0737,3.376c1.2134,2.9873,1.083,6.4219-.3027,7.9893a2.3007,2.3007,0,0,1-2.5107.6689C10.498,11.56,10.8765,9.626,10.9688,9.248a1,1,0,0,0-1.7095-.92A10.8891,10.8891,0,0,0,6,16c0,7.7754,5.4849,9.4893,7.8433,9.8652l0.2819-1.77,0.5413-.6047A2.0006,2.0006,0,0,1,14,22c0-.6924.4116-1.0586,1.2676-1.7568a8.1566,8.1566,0,0,0,1.9683-2.0859,8.2391,8.2391,0,0,1,.7651,3.7969,2.1615,2.1615,0,0,1-.668,1.5371l0.5421,0.6056,0.2816,1.7684C20.5151,25.4893,26,23.7754,26,16,26,8.1611,16.9165,2.3936,16.53,2.1523ZM19.7175,23.38a4.4707,4.4707,0,0,0,.2815-1.3341,9.5962,9.5962,0,0,0-2.2529-6.7119,1,1,0,0,0-1.7285.4785,4.6111,4.6111,0,0,1-2.0142,2.8809C13.0645,19.46,12,20.3271,12,22a3.9764,3.9764,0,0,0,.2638,1.3726C10.0358,22.48,8,20.4512,8,16a7.9093,7.9093,0,0,1,1.18-4.248,3.5824,3.5824,0,0,0,2.56,2.2139A4.2808,4.2808,0,0,0,16.27,12.69c1.4233-1.61,1.938-4.3115,1.48-7.1377C20.2773,7.665,24,11.5342,24,16,24,20.4636,21.9528,22.4911,19.7175,23.38Z"
+                  ></path>
+                  <path
+                    fill="var(--primary-color)"
+                    d="M16,23a3.5,3.5,0,1,0,3.5,3.5A3.5042,3.5042,0,0,0,16,23Zm0,5a1.5,1.5,0,1,1,1.5-1.5A1.5016,1.5016,0,0,1,16,28Z"
+                  ></path>
+                  <rect
+                    width="2"
+                    height="3"
+                    x="12"
+                    y="6"
+                    fill="var(--primary-color)"
+                  ></rect>
+                  <rect
+                    width="2"
+                    height="3"
+                    x="24"
+                    y="3"
+                    fill="var(--primary-color)"
+                  ></rect>
+                  <rect
+                    width="2"
+                    height="3"
+                    x="5"
+                    y="5"
+                    fill="var(--primary-color)"
+                  ></rect>
+                  <rect
+                    width="2"
+                    height="3"
+                    x="8"
+                    y="2"
+                    fill="var(--primary-color)"
+                  ></rect>
+                  <rect
+                    width="2"
+                    height="3"
+                    x="26"
+                    y="8"
+                    fill="var(--primary-color)"
+                  ></rect>
+                </svg>
+                No bookmarks yet, start adding some!
+              </p>
+            </div>
+          </div>
+
+          <!-- Bookmarks Table -->
+          <table
+            id="bookmarksTable"
+            class="table shadow-sm rounded-2 p-4 mt-2 col-12 d-none"
+          >
+            <thead>
+              <tr class="border-0 shadow-lg">
+                <th class="text-start" scope="col">#</th>
+                <th class="text-end" scope="col">Name</th>
+                <th class="text-end" scope="col">Visit</th>
+                <th class="text-end" scope="col">Remove</th>
+              </tr>
+            </thead>
+            <tbody id="bookmarksData" class="table-group-divider"></tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer Section -->
+    <footer class="py-3 px-0 text-center mt-auto">
+      <p class="fs-6 fs-sm-5 m-0">
+        &copy; 2024 Bookmarkly. All rights reserved.
+      </p>
+    </footer>
+
+    <!-- Main JavaScript File -->
+    <script src="js/index.js"></script>
+  </body>
+</html>
